@@ -1,0 +1,70 @@
+// 语法规则
+//  <程序>→<程序⾸部> <分程序>
+program        : programHeader block '.' #programRule;
+
+// <程序⾸部>→PROGRAM <标识符>
+programHeader  : PROGRAM IDENTIFIER #programHeaderRule;
+
+// <分程序>→[<常量说明>][<变量说明>]<语句部分>
+block          : constDeclaration? varDeclaration? statementPart #blockRule;
+
+// <常量说明>→CONST <常量定义>{，<常量定义>}    '''<分号>'''
+constDeclaration: CONST constDefinition (COMMA constDefinition)* SEMI #constDeclarationRule;
+
+// <常量定义>→<标识符>=<⽆符号整数>
+constDefinition : IDENTIFIER EQUAL NUMBER #constDefinitionRule;
+
+// <变量说明>→VAR<标识符>{，<标识符>}           '''<分号>'''
+varDeclaration : VAR IDENTIFIER (COMMA IDENTIFIER)* SEMI #varDeclarationRule;
+
+// <语句部分>→<语句> | <复合语句>
+statementPart  : statement
+               | compoundStatement
+               ;
+
+// <语句>→<赋值语句> | <条件语句 >| <循环语句> | <复合语句> | <空语句>
+statement      : assignment
+               | conditionStatement
+               | whileStatement
+               | compoundStatement
+               | emptyStatement
+               ;
+
+// <赋值语句>→<标识符>:=<表达式>
+assignment     : IDENTIFIER ASSIGN expression #assignmentRule;
+// <条件语句>→IF <条件> THEN <语句>
+conditionStatement : IF condition THEN statement #conditionStatementRule;
+// <循环语句>→WHILE <条件> DO <语句>
+whileStatement : WHILE condition DO statement #whileStatementRule;
+
+// <复合语句>→BEGIN <语句>{；<语句>} END
+// 举例：
+// if (condition) {
+//     // 这是一个复合语句，包含了两个独立的语句
+//     statement1;
+//     statement2;
+// } else {
+//     // 另一个复合语句
+//     statement3;
+//     statement4;
+// }
+
+compoundStatement : BEGIN statement (SEMI statement)* END #compoundStatementRule;
+// <空语句>
+emptyStatement : #emptyStatementRule;
+
+// <表达式>→[+|-]项 | <表达式> <加法运算符> <项>
+expression     : term ((PLUS | MINUS) term)* #expressionRule;
+// <项>→<因⼦> | <项><乘法运算符> <因⼦>
+term           : factor ((STAR | SLASH) factor)* #termRule;
+// <因⼦>→<标识符> |<常量> | (<表达式>)
+factor
+    : IDENTIFIER #identifierFactor
+    | NUMBER #numberFactor
+    | LPAREN expression RPAREN #parenExpressionFactor;
+
+// <条件>→<表达式> <关系运算符> <表达式> 用于条件语句和循环语句
+condition      : expression relation expression #conditionRule;
+
+// <关系运算符>→ = | <> | < | <= | > | >=
+relation       : EQUAL | NOT_EQUAL | LESS | LESS_EQ | GREATER | GREATER_EQ #relationRule;
