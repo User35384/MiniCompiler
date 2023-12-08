@@ -108,5 +108,6 @@ def getGrammar():
     for rule in rules:
         print(rule.left, ':', rule.right)
 
+    return rules
 
-getGrammar()
+rules = getGrammar()
