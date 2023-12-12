@@ -6,7 +6,7 @@ program        : programHeader block #programRule;
 programHeader  : PROGRAM IDENTIFIER #programHeaderRule;
 
 // <分程序>→[<常量说明>][<变量说明>]<语句部分>
-block          : constDeclaration? varDeclaration? statementPart #blockRule;
+block          : constDeclaration varDeclaration statementPart #blockRule;
 
 // <常量说明>→CONST <常量定义>{，<常量定义>}    '''<分号>'''
 //constDeclaration : CONST constDefinition (COMMA constDefinition)* SEMI #constDeclarationRule;
