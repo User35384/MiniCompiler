@@ -1,0 +1,5 @@
+PROGRAM example
+VAR x;
+BEGIN
+x := 12;
+END
