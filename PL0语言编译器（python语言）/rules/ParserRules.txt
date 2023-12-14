@@ -1,4 +1,6 @@
 // 语法规则
+// 起始语句，用于状态机accept态
+start          : program             #
 //  <程序>→<程序⾸部> <分程序>
 program        : programHeader block #programRule;
 
@@ -6,7 +8,10 @@ program        : programHeader block #programRule;
 programHeader  : PROGRAM IDENTIFIER #programHeaderRule;
 
 // <分程序>→[<常量说明>][<变量说明>]<语句部分>
-block          : constDeclaration varDeclaration statementPart #blockRule;
+block
+    : constDeclaration varDeclaration statementPart #blockRule;
+    | constDeclaration statementPart                #
+    | varDeclaration statementPart                  #
 
 // <常量说明>→CONST <常量定义>{，<常量定义>}    '''<分号>'''
 //constDeclaration : CONST constDefinition (COMMA constDefinition)* SEMI #constDeclarationRule;
