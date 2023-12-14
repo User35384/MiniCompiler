@@ -62,6 +62,7 @@ class Lexer:
     # 由外部文件得到测试代码
     def getTestCode(self):
         file_name = "PL0code.txt"
+        # file_name = "testCode.txt"
         file = open(file_name, 'r', encoding='utf-8')
         testCode = file.read()
         file.close()

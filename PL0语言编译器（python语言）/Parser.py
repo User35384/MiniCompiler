@@ -1,24 +1,31 @@
-from Lexer import Lexer, Token
-from getLRTable import LRTableGenerator
+# from Lexer import Lexer, Token          # 旧词法分析器
+from getLRTable import LRTableGenerator   # 根据语法规则生成LR分析表
+from cifa import word_analysis            # 词法分析器
 
 class ASTNode:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, type):
+        self.type = type
+        self.value = 0
         self.children = []
 
-    def addChild(self,child):
-        self.children.append(child)
+    def addChild(self, pos, child):
+        self.children.insert(pos, child)
+
+
+    def setValue(self,value):
+        self.value = value
 
 
 class Parser:
-    def __init__(self, lexer,LRTable,rules):
+    def __init__(self, lexer, LRTable, rules):
         self.lexer = lexer
-        self.tokens = lexer.tokens
+        self.tokens = lexer.word_list
         self.currentTokenIndex = 0
         self.LRTable = LRTable
         self.rules = rules
+        self.VT, self.VN = self.getWords(self.rules)
     # 使用LR分析表和词法分析器产生的token序列来进行LR(1)分析
-
+        self.ASTRoot = None
     # 获取当前读到的token，并使index+1
     def getToken(self):
         if self.currentTokenIndex < len(self.tokens):
@@ -28,6 +35,23 @@ class Parser:
         else:
             print("已经读完全部token")
             return None
+
+    # 从语法规则中获取所有终结符和非终结符
+    def getWords(self, rules):
+        VT = []  # 终结符
+        VN = []  # 非终结符
+        for rule in rules:
+            if rule.left[0].isupper() and rule.left not in VT:
+                VT.append(rule.left)
+            elif rule.left[0].islower() and rule.left not in VN:
+                VN.append(rule.left)
+            for word in rule.right:
+                if word[0].isupper() and word not in VT:
+                    VT.append(word)
+                elif word[0].islower() and word not in VN:
+                    VN.append(word)
+
+        return VT, VN
 
 
     def run(self):
@@ -39,10 +63,12 @@ class Parser:
         # 出错标记 和 当前正要读取的token 初始化
         errorFlag = False
         token = self.getToken()
+        # 用于构造语法树的栈
+        ASTBuildStack = []
         # 开启语法分析主循环
         while self.currentTokenIndex <= len(self.tokens):
             currentStatus = statusStack[-1]        # 当前状态是状态栈的栈顶元素
-            shiftWord = token.type                 # token的类型就是接收的符号
+            shiftWord = token['type']                 # token的类型就是接收的符号
             try:
                 mapWord1,mapWord2 = self.LRTable[(currentStatus, shiftWord)]  # 读出表中对应的元素
             except KeyError:
@@ -69,6 +95,31 @@ class Parser:
                     ruleNO = mapWord2
                     rule = self.rules[ruleNO]
                     rightLength = len(rule.right)
+                    # 在reduce时进行相应的操作来构建AST
+                    # 当栈中的节点类型正好是本条reduce规则右侧的符号类型时，不需新建节点
+                    thisNode = ASTNode(rule.left)
+                    print("测试如下：")
+                    print("栈中的符号依次为：")
+                    for node in ASTBuildStack:
+                        print(node.type, end=' ')
+                    print("")
+                    print("规约规则右侧的符号依次为：")
+                    for word in rule.right:
+                        print(word, end=' ')
+                    print("")
+
+                    # 逆序查看栈中所有的非终结符，看其个数和内容是否与本规则完全对应
+                    for index, word in enumerate(reversed(rule.right)):
+                        if word in self.VN:
+                            newNode = ASTBuildStack.pop()
+                            thisNode.addChild(0, newNode)
+                            print(f"插入非终结符{newNode.type}")
+                        elif word in self.VT:
+                            newNode = ASTNode(word)
+                            thisNode.addChild(0, newNode)
+                            print(f"插入终结符{newNode.type}")
+                    self.ASTRoot = thisNode
+                    ASTBuildStack.append(thisNode)
                     # 如果这条规则右边有n个符号，符号栈和状态栈都将栈顶的n个元素吐出
                     while rightLength > 0:
                         statusStack.pop()
@@ -109,9 +160,12 @@ class Parser:
                     print("")
                     break
 
-    # 规约时进行的操作
-    def reduceAction(self):
-        ()
+    # 打印语法树
+    def printAST(self, root, depth):
+
+        print("    " * (depth) + f"[{depth}]" + str(root.type))
+        for child in root.children:
+            self.printAST(child, depth+1)
 
 
 
@@ -122,9 +176,9 @@ if __name__ == "__main__":
     LRTable = tableGenerator.getTable()
     grammarRules = tableGenerator.getRules()
     # 定义词法&语法分析器对象
-    lexer = Lexer()
+    lexer = word_analysis(file='PL0code.txt')
     parser = Parser(lexer, LRTable, grammarRules)
 
     parser.run()
-
+    parser.printAST(parser.ASTRoot,0)
 
