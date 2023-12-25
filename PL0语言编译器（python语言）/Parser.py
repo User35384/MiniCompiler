@@ -1,6 +1,7 @@
-# from Lexer import Lexer, Token          # 旧词法分析器
-from getLRTable import LRTableGenerator   # 根据语法规则生成LR分析表
-from cifa import word_analysis            # 词法分析器
+# from cifa import word_analysis            # 旧词法分析器
+from Lexer import Lexer                     # 词法分析器
+from getLRTable import LRTableGenerator     # 根据语法规则生成LR分析表
+
 
 class ASTNode:
     def __init__(self, type):
@@ -19,7 +20,8 @@ class ASTNode:
 class Parser:
     def __init__(self, lexer, LRTable, rules):
         self.lexer = lexer
-        self.tokens = lexer.word_list
+        # self.tokens = lexer.word_list
+        self.tokens = lexer.token_list
         self.currentTokenIndex = 0
         self.LRTable = LRTable
         self.rules = rules
@@ -175,10 +177,15 @@ if __name__ == "__main__":
     tableGenerator = LRTableGenerator()
     LRTable = tableGenerator.getTable()
     grammarRules = tableGenerator.getRules()
+
+    filePath = "testCodes"
+    fileName = "PL0code.txt"
+    file = filePath + '/' + fileName
+
     # 定义词法&语法分析器对象
-    lexer = word_analysis(file='PL0code.txt')
+    lexer = Lexer(file)
     parser = Parser(lexer, LRTable, grammarRules)
 
     parser.run()
-    parser.printAST(parser.ASTRoot,0)
+    parser.printAST(parser.ASTRoot, 0)
 
