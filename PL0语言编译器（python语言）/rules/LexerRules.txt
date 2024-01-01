@@ -20,12 +20,14 @@ MINUS      : '-';
 STAR       : '*';
 SLASH      : '/';
 ASSIGN     : ':=';
+
 EQUAL      : '=';
 NOT_EQUAL  : '<>';
 LESS       : '<';
 LESS_EQ    : '<=';
 GREATER    : '>';
 GREATER_EQ : '>=';
+
 LPAREN     : '(';
 RPAREN     : ')';
 SEMI       : ';';
