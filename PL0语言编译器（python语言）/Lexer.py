@@ -160,3 +160,5 @@ class Lexer():
 
 if __name__ == '__main__':
     x=Lexer("testCodes/PL0code.txt")
+    print("词法分析器结果如下：")
+    x.print_result()

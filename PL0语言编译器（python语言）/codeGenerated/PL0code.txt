@@ -1,0 +1,16 @@
+x = 12
+y = 2
+LABEL L0
+T0 = x < 5
+IF NOT T0 GOTO L1
+T1 = x + 1
+x = T1
+GOTO L0
+LABEL L1
+T2 = y > 0
+IF NOT T2 GOTO L2
+T3 = y - 1
+y = T3
+LABEL L2
+T4 = y + x
+y = T4

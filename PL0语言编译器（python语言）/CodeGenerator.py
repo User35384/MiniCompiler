@@ -222,21 +222,24 @@ if __name__ == "__main__":
     tableGenerator = LRTableGenerator()
     LRTable = tableGenerator.getTable()
     grammarRules = tableGenerator.getRules()
-    # 词法分析
 
     # 项目要求中给到的测试源代码
-    lexer = Lexer('testCodes/PL0code.txt')
+    # fileName = 'PL0code.txt'
     # 三个较为复杂的测试源代码
-    # lexer = Lexer('testCodes/sample1.txt')
-    # lexer = Lexer('testCodes/sample2.txt')
-    # lexer = Lexer('testCodes/sample3.txt')
+    fileName = 'sample1.txt'
+    # fileName = 'sample2.txt'
+    # fileName = 'sample3.txt'
     # 报错测试代码
-    # lexer = Lexer('testCodes/errorTest1.txt')   # 变量未初始化(中间代码生成报错)
-    # lexer = Lexer('testCodes/errorTest2.txt')  # 变量名写错，识别为未声明变量(中间代码生成报错)
-    # lexer = Lexer('testCodes/errorTest3.txt')  # 给常量二次赋值(中间代码生成报错)
-    # lexer = Lexer('testCodes/errorTest4.txt')  # 将赋值号:=写为=(语法分析报错)
-    # lexer = Lexer('testCodes/errorTest5.txt')  # 变量标识符开头使用下划线(词法分析报错)
-    # lexer = Lexer('testCodes/errorTest6.txt')  # 语句结束后分号缺失(语法分析报错)
+    # fileName = 'errorTest1.txt'   # 变量未初始化(中间代码生成报错)
+    # fileName = 'errorTest2.txt'  # 变量名写错，识别为未声明变量(中间代码生成报错)
+    # fileName = 'errorTest3.txt'  # 给常量二次赋值(中间代码生成报错)
+    # fileName = 'errorTest4.txt'  # 将赋值号:=写为=(语法分析报错)
+    # fileName = 'errorTest5.txt'  # 变量标识符开头使用下划线(词法分析报错)
+    # fileName = 'errorTest6.txt'  # 语句结束后分号缺失(语法分析报错)
+    inputPath = 'testCodes/'+fileName
+
+    # 词法分析
+    lexer = Lexer(inputPath)
     # 语法分析
     parser = Parser(lexer, LRTable, grammarRules)
     parser.run()
@@ -247,6 +250,11 @@ if __name__ == "__main__":
     code_generator = PL0CodeGenerator(parser)
     # 输出中间代码（从根开始遍历）
     code_generator.generator()
+
+    outputPath = 'codeGenerated/'+ fileName
+    file = open(outputPath, 'w+')
     print("生成的中间代码如下 :")
     for instr in code_generator.instructions:
         print(instr)
+        file.write(instr+'\n')
+    file.close()

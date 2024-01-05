@@ -1,0 +1,15 @@
+MinValue = 1
+MaxValue = 100
+number = 50
+T0 = number > MinValue
+IF NOT T0 GOTO L0
+T1 = number * 2
+result = T1
+LABEL L1
+T2 = result < MaxValue
+IF NOT T2 GOTO L2
+T3 = result + number
+result = T3
+GOTO L1
+LABEL L2
+LABEL L0
