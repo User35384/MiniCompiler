@@ -1,0 +1,14 @@
+PROGRAM SampleProgram
+CONST MaxValue = 100,MinValue = 1;
+VAR number, result;
+BEGIN
+  number := 50;
+  IF number > MinValue THEN
+    BEGIN
+      result := number * 2;
+      WHILE result < MaxValue DO
+        BEGIN
+          result := result + number;
+        END
+    END
+END

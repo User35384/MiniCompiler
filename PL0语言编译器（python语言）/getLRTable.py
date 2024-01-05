@@ -25,7 +25,7 @@ class LRStatus:
             return False
 
     # 记录接收的符号和迁移到的状态,将其放入移进映射表中
-    def addShift(self,acceptWord,shiftStatus):
+    def addShift(self, acceptWord, shiftStatus):
         self.shiftMap[acceptWord] = shiftStatus
 
 class LRTableGenerator:
@@ -35,27 +35,24 @@ class LRTableGenerator:
         self.VT.append('#')
         # 获得所有LR项目
         items = self.getLRItems(self.rules)
-        print("以下是所有LR项目")
-        for item in items:
-            print(item.rule.left, ':', item.rule.right, "点的位置:", item.dotPos)
-
+        # print("以下是所有LR项目")
+        # for item in items:
+        #     print(item.rule.left, ':', item.rule.right, "点的位置:", item.dotPos)
         startGroup = []
         startGroup.append(items[0])
         startGroup = self.getClosure(startGroup, items)
-        print("以下是状态0的闭包项目集")
-        for item in startGroup:
-            self.printItem(item)
-        print("")
+        # print("以下是状态0的闭包项目集")
+        # for item in startGroup:
+        #     self.printItem(item)
+        # print("")
+        self.statusGroup = self.buildStatusGroup(startGroup, items)
+        # print("以下是所有闭包项目集")
+        # for status in statusGroup:
+        #     self.printStatus(status)
+        # print("终结符VT:", self.VT)
+        # print("非终结符VN:", self.VN)
 
-        statusGroup = self.buildStatusGroup(startGroup, items)
-        print("以下是所有闭包项目集")
-        for status in statusGroup:
-            self.printStatus(status)
-
-        print("终结符VT:", self.VT)
-        print("非终结符VN:", self.VN)
-
-        self.LRTable = self.buildLRTable(statusGroup, self.VN, self.VT, self.rules)
+        self.LRTable = self.buildLRTable(self.statusGroup, self.VN, self.VT, self.rules)
 
     # 由外部文件得到语法规则
     def getGrammar(self):
@@ -70,21 +67,21 @@ class LRTableGenerator:
             input.append(line.strip())  # 去除行末尾的换行符，并添加到列表中
             line = file.readline()  # 读取下一行
         file.close()
-        print("所有行如下：")
-        for line in input:
-            print(line)
+        # print("所有行如下：")
+        # for line in input:
+        #     print(line)
 
         # 从input列表中提取不是注释的行
         for line in input:
             if not line.startswith("//") and line != '':
                 grammar.append(line)
 
-        print("所有语法规则如下：")
-        for line in grammar:
-            print(line)
+        # print("所有语法规则如下：")
+        # for line in grammar:
+        #     print(line)
 
         # 从所有行中得到一个语法规则表
-        print("下面是测试输出语句(test) : ")
+        # print("下面是测试输出语句(test) : ")
         rules = []  # 用列表存储所有语法规则
         key = ""  # 存储规则左侧
         value = []  # 存储规则右侧
@@ -107,35 +104,35 @@ class LRTableGenerator:
                     if word == '|':
                         workingFlag = 2
                         value = []
-                        print("并列规则")
+                        # print("并列规则")
                     elif word != ';':
                         key = word
                         value = []
                         workingFlag = 1
-                        print("读入规则左侧，切入状态1")
+                        # print("读入规则左侧，切入状态1")
 
                 # 这个单词是规则右侧单词，加入到value列表中
                 elif workingFlag == 1:
                     # 读到冒号不算在内
                     if word == ':':
                         ()
-                        print("读到冒号，开始读取语法规则右侧")
+                        # print("读到冒号，开始读取语法规则右侧")
                     elif word == '|':
                         value = []
                         workingFlag = 2
-                        print("读到|分隔符，开始读取并列语法规则")
+                        # print("读到|分隔符，开始读取并列语法规则")
                     # 在一个规则的结尾，必须有以#开头的单词，当读到它时，结束此规则的读取
                     elif word.startswith('#'):
                         rule = grammarRule(key, value)
                         rules.append(rule)
-                        print("读入规则+1")
+                        # print("读入规则+1")
                         # for rule in rules:
                         #     print(rule.left, ':', rule.right)
                         workingFlag = 0
                     # 其它情况应该被加入到value内
                     else:
                         value.append(word)
-                        print("读入单词+1")
+                        # print("读入单词+1")
 
                 # 涉及到并列语法规则的读取
                 elif workingFlag == 2:
@@ -144,7 +141,7 @@ class LRTableGenerator:
                         rule = grammarRule(key, value)
                         rules.append(rule)
                         workingFlag = 0
-                        print("读入规则+1")
+                        # print("读入规则+1")
                         # for rule in rules:
                         #     print(rule.left, ':', rule.right)
                     # 出现其它word都应该被读入规则
@@ -153,9 +150,9 @@ class LRTableGenerator:
                     else:
                         value.append(word)
 
-        print("以下是所有读取到的语法规则：")
-        for rule in rules:
-            print(rule.left, ':', rule.right)
+        # print("以下是所有读取到的语法规则：")
+        # for rule in rules:
+        #     print(rule.left, ':', rule.right)
 
         return rules
 
@@ -249,7 +246,7 @@ class LRTableGenerator:
         statusGroup.append(startStatus)
 
         for status in statusGroup:
-            print(f"当前正在为状态{status.groupID}创建下一状态")
+            # print(f"当前正在为状态{status.groupID}创建下一状态")
             wordList = {}   # 用wordList来存储一个LR项目集合中所有点后面出现的word以及其对应的rule的位置
             thisGroup = status.LRItemGroup
 
@@ -266,20 +263,20 @@ class LRTableGenerator:
 
 
             for word,indexes in wordList.items():
-                print(f"为{word}-{indexes}创建新状态")
+                # print(f"为{word}-{indexes}创建新状态")
                 newGroup = []
                 sameFlag = False
                 for index in indexes:
                     item = thisGroup[index]
                     # 找到这个LR项目点后移一位对应的项目
                     nextItem = self.findNextItem(item, allItem)
-                    print(f"成功找到下一个item")
+                    # print(f"成功找到下一个item")
                     newGroup.append(nextItem)
                 newGroup = self.getClosure(newGroup, allItem)
 
                 for nStatus in statusGroup:
                     if nStatus.equalGroup(newGroup):
-                        print("找到相同组:", status.groupID, ",不重复添加新组")
+                        # print("找到相同组:", status.groupID, ",不重复添加新组")
                         status.addShift(word, nStatus)
                         sameFlag = True
                         break
@@ -287,57 +284,13 @@ class LRTableGenerator:
                 if sameFlag == False:
                     # 得到闭包后即可创建新状态，将状态总数+1
                     statusNumber = statusNumber + 1
-                    print("添加第", statusNumber, "状态: ")
+                    # print("添加第", statusNumber, "状态: ")
                     newStatus = LRStatus(newGroup, statusNumber)
-                    self.printStatus(newStatus)
+                    # self.printStatus(newStatus)
                     statusGroup.append(newStatus)
                     finishFlag = 0  # 只要有新加入的status，就表示还没结束
                     # 在本项目的移进映射表中加入此迁移
                     status.addShift(word, newStatus)
-
-
-            # for item in thisGroup:
-            #     newGroup = []
-            #     sameFlag = False
-            #     right = item.rule.right
-            #     # 仅当点后面有符号时，情况才被考虑在内
-            #     if item.dotPos < len(right):
-            #
-            #         # print("当前item: ")
-            #         # self.printItem(item)
-            #
-            #         # 找到这个LR项目中标点后的符号
-            #         nextWord = right[item.dotPos]
-            #         # 找到这个LR项目点后移一位对应的项目
-            #         nextItem = self.findNextItem(item, allItem)
-            #
-            #         # print("下一个item是: ")
-            #         # self.printItem(nextItem)
-            #         # 将此后移一位的项目加入到newGroup中并对其求闭包
-            #         newGroup.append(nextItem)
-            #         newGroup = self.getClosure(newGroup, allItem)
-            #
-            #         print("求得闭包集为: ")
-            #         for nItem in newGroup:
-            #             self.printItem(nItem)
-            #
-            #         for nStatus in statusGroup:
-            #             if nStatus.equalGroup(newGroup):
-            #                 print("找到相同组:", status.groupID, ",不重复添加新组")
-            #                 status.addShift(nextWord, nStatus)
-            #                 sameFlag = True
-            #                 break
-            #
-            #         if sameFlag == False:
-            #             # 得到闭包后即可创建新状态，将状态总数+1
-            #             statusNumber = statusNumber + 1
-            #             print("添加第", statusNumber, "状态: ")
-            #             newStatus = LRStatus(newGroup, statusNumber)
-            #             self.printStatus(newStatus)
-            #             statusGroup.append(newStatus)
-            #             finishFlag = 0  # 只要有新加入的status，就表示还没结束
-            #             # 在本项目的移进映射表中加入此迁移
-            #             status.addShift(nextWord, newStatus)
 
         return statusGroup
 
@@ -386,6 +339,7 @@ class LRTableGenerator:
                 ruleNO = shiftStatus
                 print("状态", statusNO, "接收", shiftWord, "进行", action, "使用第", ruleNO, "号规则", end=' ')
                 print("(", statusNO, ",", shiftWord, ")->(", action, ruleNO, ")")
+
     def getTable(self):
         return self.LRTable
 
@@ -393,6 +347,14 @@ class LRTableGenerator:
         return self.rules
 
 if __name__ == "__main__":
-    LRTableGenerator().printLRTable()
+    tableGenerator = LRTableGenerator()
+
+    print("LR项目集规范族的所有LR状态如下: ")
+    for status in tableGenerator.statusGroup:
+        tableGenerator.printStatus(status)
+
+    print("LR分析表如下: ")
+    tableGenerator.printLRTable()
+
 
 

@@ -15,7 +15,6 @@ class ASTNode:
     def addChild(self, pos, child):
         self.children.insert(pos, child)
 
-
     def setNumValue(self,numValue):
         self.numValue = numValue
 
@@ -68,7 +67,6 @@ class Parser:
 
         return VT, VN
 
-
     def run(self):
         # 符号栈和状态栈初始化
         statusStack = []
@@ -92,6 +90,7 @@ class Parser:
             except KeyError:
                 print(f"error : 状态{currentStatus}下不接收符号{shiftWord}")
                 errorFlag = True
+                raise Exception(f"Parser-Error : 状态{currentStatus}下不接收符号{shiftWord}")
                 break
             if errorFlag == False:
                 if mapWord1 == "shift":
@@ -105,45 +104,45 @@ class Parser:
                     # 读取下一个符号
                     token = self.getToken()
 
-                    print(f"状态{currentStatus}遇到符号{shiftWord},进行{mapWord1}至状态{shiftStatusNO}")
-                    print("当前符号栈和状态栈的栈内元素为: ")
-                    print("符号栈: ", symbolStack)
-                    print("状态栈: ", statusStack)
-                    print("词条栈: ", tokenStack)
-                    print("")
+                    # print(f"状态{currentStatus}遇到符号{shiftWord},进行{mapWord1}至状态{shiftStatusNO}")
+                    # print("当前符号栈和状态栈的栈内元素为: ")
+                    # print("符号栈: ", symbolStack)
+                    # print("状态栈: ", statusStack)
+                    # print("词条栈: ", tokenStack)
+                    # print("")
 
                 elif mapWord1 == "reduce":
                     ruleNO = mapWord2
                     rule = self.rules[ruleNO]
                     rightLength = len(rule.right)
 
-                    # 在reduce时进行相应的操作来构建AST
+                    # # 在reduce时进行相应的操作来构建AST
                     thisNode = ASTNode(rule.left)
-                    print("测试如下：")
-                    print("栈中的符号依次为：")
-                    for node in ASTBuildStack:
-                        print(node.type, end=' ')
-                    print("")
-                    print("规约规则右侧的符号依次为：")
-                    for word in rule.right:
-                        print(word, end=' ')
-                    print("")
+                    # # print("测试如下：")
+                    # # print("栈中的符号依次为：")
+                    # for node in ASTBuildStack:
+                    #     print(node.type, end=' ')
+                    # # print("")
+                    # # print("规约规则右侧的符号依次为：")
+                    # for word in rule.right:
+                    #     print(word, end=' ')
+                    # print("")
 
                     # 当栈中的节点类型正好是本条reduce规则右侧的符号类型时，不需新建节点
                     # 逆序查看栈中所有的非终结符，看其个数和内容是否与本规则完全对应
                     for index, word in enumerate(reversed(rule.right)):
-                        print(f"这是规约规则右侧中倒数第{index}个符号:{word}")
+                        # print(f"这是规约规则右侧中倒数第{index}个符号:{word}")
                         if word in self.VN:
                             newNode = ASTBuildStack.pop()
                             newNode.setValue(tokenStack[-index-1]['word'])   # 子节点的value设置为词条栈中对应词条的word值
                             # 这里必须是-index-1 !! 因为索引为'-1'才是倒数第一个，也就是倒数时索引为'0'的那一项
                             thisNode.addChild(0, newNode)
-                            print(f"插入非终结符{newNode.type},其值为{newNode.value}")
+                            # print(f"插入非终结符{newNode.type},其值为{newNode.value}")
                         elif word in self.VT:
                             newNode = ASTNode(word)
                             newNode.setValue(tokenStack[-index-1]['word'])   # 子节点的value设置为词条栈中对应词条的word值
                             thisNode.addChild(0, newNode)
-                            print(f"插入终结符{newNode.type},其值为{newNode.value}")
+                            # print(f"插入终结符{newNode.type},其值为{newNode.value}")
                     # 在添加完本节点所有的子节点后，调用reduceLogic函数来计算本节点的对应值
                     thisValue = self.reduceLogic(rule, thisNode)
                     thisNode.setValue(thisValue)
@@ -160,34 +159,33 @@ class Parser:
                     # 将对应的规约左侧的token也加入词条栈
                     tokenStack.append({'line': None, 'type': rule.left, 'word': thisNode.value})
 
-                    print(f"状态{currentStatus}遇到符号{shiftWord},进行{mapWord1},")
-                    print(f"使用{ruleNO}号规则:{rule.left}->{rule.right}进行规约,共退出{len(rule.right)}个状态和符号,")
-                    print(f"加入新符号{rule.left}")
-                    print("当前符号栈和状态栈的栈内元素为: ")
-                    print("符号栈: ", symbolStack)
-                    print("状态栈: ", statusStack)
+                    # print(f"状态{currentStatus}遇到符号{shiftWord},进行{mapWord1},")
+                    # print(f"使用{ruleNO}号规则:{rule.left}->{rule.right}进行规约,共退出{len(rule.right)}个状态和符号,")
+                    # print(f"加入新符号{rule.left}")
+                    # print("当前符号栈和状态栈的栈内元素为: ")
+                    # print("符号栈: ", symbolStack)
+                    # print("状态栈: ", statusStack)
 
                     # 从吐出n个元素后的状态栈取栈顶，查表得到该状态接收当前符号栈栈顶符号的动作
                     currentStatus = statusStack[-1]
                     currentSymbol = symbolStack[-1]
                     gotoWord1,gotoWord2 = self.LRTable[(currentStatus,currentSymbol)]
-                    if gotoWord1 == "goto":
-                        print("goto")
+                    # if gotoWord1 == "goto":
+                    #     print("goto")
                     gotoStatus = gotoWord2
                     statusStack.append(gotoStatus)
 
-                    print(f"新状态{currentStatus}遇到符号{currentSymbol}，进行{gotoWord1}至状态{gotoWord2}")
-                    print("当前符号栈和状态栈的栈内元素为: ")
-                    print("符号栈: ", symbolStack)
-                    print("状态栈: ", statusStack)
-                    print("")
+                    # print(f"新状态{currentStatus}遇到符号{currentSymbol}，进行{gotoWord1}至状态{gotoWord2}")
+                    # print("当前符号栈和状态栈的栈内元素为: ")
+                    # print("符号栈: ", symbolStack)
+                    # print("状态栈: ", statusStack)
+                    # print("")
 
                 elif mapWord1 == "accept":
-
                     print(f"状态{currentStatus}遇到符号{shiftWord},进行{mapWord1}")
-                    print("当前符号栈和状态栈的栈内元素为: ")
-                    print("符号栈: ", symbolStack)
-                    print("状态栈: ", statusStack)
+                    # print("当前符号栈和状态栈的栈内元素为: ")
+                    # print("符号栈: ", symbolStack)
+                    # print("状态栈: ", statusStack)
                     print("语法分析成功")
                     print("")
                     break
@@ -233,7 +231,6 @@ class Parser:
                     if define['identifier'] == child_IDENTIFIER.value:
                         child_IDENTIFIER.setNumValue(define['value'])
 
-
                 thisNode.setNumValue(child_IDENTIFIER.numValue)
                 thisValue = child_IDENTIFIER.value
                 return thisValue
@@ -271,26 +268,6 @@ class Parser:
                 thisValue = child_GREATER.value
                 return thisValue
 
-        if r.left == 'condition':
-            # condition -> expression relation expression
-            if length == 3 and r.right[0] == 'expression' and r.right[1] == 'relation' and r.right[2] == 'expression':
-                child_exp_1 = thisNode.children[0]
-                child_relation = thisNode.children[1]
-                child_exp_2 = thisNode.children[2]
-                # 将本节点的numValue设置为条件判断的结果
-                if child_relation.value == '<':
-                    thisNode.setNumValue(child_exp_1.numValue < child_exp_2.numValue)
-                elif child_relation.value == '<=':
-                    thisNode.setNumValue(child_exp_1.numValue <= child_exp_2.numValue)
-                elif child_relation.value == '>':
-                    thisNode.setNumValue(child_exp_1.numValue > child_exp_2.numValue)
-                elif child_relation.value == '>=':
-                    thisNode.setNumValue(child_exp_1.numValue >= child_exp_2.numValue)
-                elif child_relation.value == '<>':
-                    thisNode.setNumValue(child_exp_1.numValue != child_exp_2.numValue)
-                elif child_relation.value == '=':
-                    thisNode.setNumValue(child_exp_1.numValue == child_exp_2.numValue)
-
         return None
 
 
@@ -311,14 +288,14 @@ if __name__ == "__main__":
     LRTable = tableGenerator.getTable()
     grammarRules = tableGenerator.getRules()
 
-    filePath = "testCodes"
-    fileName = "PL0code.txt"
-    file = filePath + '/' + fileName
-
-    # 定义词法&语法分析器对象
-    lexer = Lexer(file)
+    filePath = "testCodes/PL0code.txt"
+    # 词法分析
+    lexer = Lexer(filePath)
+    # 语法分析
     parser = Parser(lexer, LRTable, grammarRules)
-
     parser.run()
+
+    # 递归输出语法树
+    print("源代码的抽象语法树如下: ")
     parser.printAST(parser.ASTRoot, 0)
 

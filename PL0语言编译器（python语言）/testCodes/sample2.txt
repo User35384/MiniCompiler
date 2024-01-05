@@ -1,0 +1,16 @@
+PROGRAM SampleProgram
+CONST MaxNum = 100;
+VAR a, b, c;
+
+BEGIN
+  a := 10;
+  b := 20;
+  IF a < b THEN
+    BEGIN
+      c := a + b;
+    END;
+  WHILE c < MaxNum DO
+    BEGIN
+      c := c + 1;
+    END
+END

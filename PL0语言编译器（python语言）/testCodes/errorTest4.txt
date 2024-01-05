@@ -1,0 +1,33 @@
+PROGRAM OperatorsDemo
+CONST Factor = 5;
+VAR x, y, z, result;
+BEGIN
+  x := 10;
+  y = 20;
+  z := 30;
+  Factor := 50;
+  result := x + y * Factor - z;
+
+  IF x < y THEN                  
+    BEGIN
+      x := x * Factor;
+    END
+    ;
+
+  IF y <> z THEN                
+    BEGIN
+      y := y / Factor;           
+    END
+    ;
+
+  WHILE z <= 100 DO             
+    BEGIN
+      z := z + 1;                
+    END
+    ;
+
+  IF result = 0 THEN             
+    BEGIN
+      result := 1;
+    END
+END

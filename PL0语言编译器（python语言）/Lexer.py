@@ -20,7 +20,7 @@ class Lexer():
 
         self.get_first_set()
         self.create_list(file_name)
-        self.print_result()
+        # self.print_result()
 
     def get_first_set(self):
         for element in sep_set:
@@ -151,11 +151,12 @@ class Lexer():
                                 self.token_list.append({'line': line_count, 'word': word,'type':'ASSIGN'})
                             else:
                                 print(f'编译错误，在第{line_count}行')
-                                return
+                                raise Exception(f"Lexer-Error:编译错误，在第{line_count}行")
                 else:
                     print(f'编译错误，在第{line_count}行')
-                    return
+                    raise Exception(f"Lexer-Error:编译错误，在第{line_count}行")
+
         self.token_list.append({'line':line_count,'word':'#','type':'#'})
 
-
-x=Lexer("testCodes/PL0code.txt")
+if __name__ == '__main__':
+    x=Lexer("testCodes/PL0code.txt")
